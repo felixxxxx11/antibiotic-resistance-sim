@@ -20,6 +20,13 @@ This is a compact "Wright-Fisher" style model. It is deliberately simple so that
 secondary students can see the mechanism of natural selection and antibiotic
 resistance without molecular detail.
 
+Assumptions (discuss these with students):
+    * fixed population size (N stays constant each generation),
+    * only two genotypes ('S' / 'R'), selected on by relative fitness,
+    * fitness values are ILLUSTRATIVE TEACHING VALUES, not clinical data,
+    * no immune system, no spatial structure, no horizontal gene transfer.
+    The model explains *why* resistance evolves by selection; it is not medical advice.
+
 No third-party libraries are required to run the model itself. If matplotlib is
 available, a plot is also saved for the classroom.
 
@@ -105,6 +112,16 @@ def run_simulation(
     return history
 
 
+def average_runs(runs: int = 5, **kwargs) -> List[float]:
+    """Run the model `runs` times (different seeds) and return the average frequency curve."""
+    import random as _random
+    total = None
+    for i in range(runs):
+        h = run_simulation(seed=_random.randint(0, 1 << 30), **kwargs)
+        total = h if total is None else [x + y for x, y in zip(total, h)]
+    return [x / runs for x in total]
+
+
 # ----------------------------------------------------------------------------
 # Scenarios used in the lesson
 # ----------------------------------------------------------------------------
@@ -116,8 +133,9 @@ def scenarios():
     # B. No antibiotic at all -> resistance slowly declines (cost of resistance)
     b = run_simulation(n=1000, generations=40, f0_resistant=0.50,
                        antibiotic_schedule=lambda g: False, seed=1)
-    # C. Sub-lethal / half dose taken throughout -> resistance still rises,
-    #    just more slowly than a full dose (stewardship message).
+    # C. Weak selection throughout -> resistance still rises, just more slowly
+    #    than strong selection. Communicate as "weak selection scenario",
+    #    not as a medical dose recommendation.
     c = run_simulation(n=1000, generations=40, f0_resistant=0.01,
                        antibiotic_schedule=lambda g: True,
                        fitness=Fitness(s_on_abx=0.60, r_on_abx=0.95), seed=1)
@@ -127,7 +145,7 @@ def scenarios():
     return {
         "A": (a, "Full continuous antibiotic course (N=1000, start R=1%)"),
         "B": (b, "No antibiotic (N=1000, start R=50%) -> cost of resistance"),
-        "C": (c, "Sub-lethal / half dose throughout (N=1000, start R=1%) -> resistance still rises, more slowly"),
+        "C": (c, "Weak selection scenario (N=1000, start R=1%) -> resistance still rises, more slowly"),
         "D": (d, "Small population, no antibiotic (N=50, start R=30%) -> genetic drift"),
     }
 

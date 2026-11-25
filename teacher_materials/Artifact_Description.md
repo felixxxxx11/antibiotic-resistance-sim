@@ -13,8 +13,7 @@ The artifact addresses a real STEM problem — how antibiotic misuse drives resi
 and links Biology (inheritance and natural selection) with Mathematics (probability,
 sampling, frequency and rates) and Computing. The pedagogical intention is for students
 to *read the model*, not just run it: they decompose the process into selection,
-reproduction and recording; they change **one variable at a time** (starting frequency,
-dose, population size); and they use the resulting graph as evidence to justify a
+reproduction and recording; they change **one variable at a time** (starting frequency, selection strength, population size); and they use the resulting graph as evidence to justify a
 recommendation about antibiotic use. Computational thinking is therefore embedded in the
 activity rather than added on top: abstraction (a bacterium reduced to a genotype),
 algorithmic thinking (the generation loop), pattern recognition (rising/falling curves,

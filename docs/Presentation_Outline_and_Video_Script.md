@@ -39,9 +39,9 @@ Run the default (start 1% resistant):
 "Watch: one percent at the start… and within a few generations it's nearly all resistant.
 That's natural selection. This is the 'aha' moment my students predict first, then check."
 
-**[1:30–2:05] Two more cases — cost & dose**
+**[1:30–2:05] Two more cases — cost & selection strength**
 "Take the drug away and the resistant ones pay a cost, so resistance falls back — a fair
-test of one variable. And a half dose still breeds resistance, just slower. So 'less
+test of one variable. And weak selection still breeds resistance, just slower. So 'less
 antibiotic' isn't automatically safer."
 
 **[2:05–2:40] Student experiment**
@@ -54,4 +54,5 @@ spot the pattern, and evaluate."
 "By the end, they can back up a real recommendation about antibiotic use with evidence
 they produced themselves — biology and coding in one task. That's the module."
 
+Same parameters can give slightly different curves — students should repeat runs and average them.*
 *(≈330 spoken words ≈ 2:45–3:00 at a measured pace.)*

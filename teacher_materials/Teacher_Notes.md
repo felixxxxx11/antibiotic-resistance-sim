@@ -26,7 +26,7 @@ The model is deliberately *simple* so that the **mechanism is visible** and the 
 By the end of the module students can:
 1. **Explain** how selection changes the frequency of a trait in a population (natural selection → antibiotic resistance).
 2. **Read and describe** a frequency-vs-generation graph, including *when* and *how fast* resistance rises.
-3. **Design a fair test** by changing one variable (starting frequency, dose, population size, number of generations) and predicting the outcome first.
+3. **Design a fair test** by changing one variable (starting frequency, selection strength, population size, number of generations) and predicting the outcome first.
 4. **Interpret data** to justify a recommendation about antibiotic use (transfer beyond the simulation).
 
 ---
@@ -37,7 +37,7 @@ By the end of the module students can:
 |---|---|
 | **Decomposition** | Breaking the process into: selection → reproduction → recording. |
 | **Abstraction** | A bacterium is modelled only by its genotype (`S`/`R`); molecular detail is ignored. |
-| **Pattern recognition** | Rising/falling curves; *fixation* (100%); *loss* of a trait; effect of dose. |
+| **Pattern recognition** | Rising/falling curves; *fixation* (100%); *loss* of a trait; effect of selection strength. |
 | **Algorithm design** | The per-generation loop; the fair-test procedure; the plotting routine. |
 | **Evaluation** | Comparing scenarios; judging which treatment strategy keeps resistance lowest. |
 | **Debugging** | When a result looks wrong (e.g., % > 100 or a flat line), students trace the logic. |
@@ -63,9 +63,9 @@ By the end of the module students can:
 | Time | Activity |
 |---|---|
 | 0–5 | Recall the Lesson-1 finding. Pose the driving question: *what does this imply for how we should use antibiotics?* |
-| 5–15 | **Choose ONE variable** (starting %, dose, population size, generations). Students fill in a one-variable table (what I change / what I keep the same / my prediction). |
+| 5–15 | **Choose ONE variable** (starting %, selection strength, population size, generations). Students fill in a one-variable table (what I change / what I keep the same / my prediction). |
 | 15–30 | **Run and compare** (notebook §4–§5, or multiple scenarios). Students capture the curve and note the final resistant %. |
-| 30–40 | **CER explanation:** Claim – Evidence – Reasoning. Then a short evidence-based **recommendation** ("finish the full course", "don't take low doses", etc.). |
+| 30–40 | **CER explanation:** Claim – Evidence – Reasoning. Then a short evidence-based **recommendation** ("take the full prescribed course", "don't use leftover antibiotics", etc.). |
 | 40–45 | Share-out: groups compare which variable had the biggest effect on resistance. |
 
 **Product of Lesson 2:** one-variable table + comparison graph + CER paragraph + recommendation.
@@ -76,7 +76,7 @@ By the end of the module students can:
 
 - **Support:** start with the default run only; prompt cards with sentence starters ("When the antibiotic was on, the resistant % ____ because ____"); pre-filled parameter cell.
 - **Core:** full one-variable experiment + CER paragraph.
-- **Stretch:** combine two runs to recommend a *dose + duration* strategy; explore the **small-population (drift)** case and explain why chance matters; add a **mutation** rate and discuss how resistance can appear from nothing (set `mutation_rate > 0` in `run_simulation`).
+- **Stretch:** combine two runs to compare selection strengths (a *strategy* discussion, not a dosing recommendation); explore the **small-population (drift)** case and explain why chance matters; repeat a run several times and average it to reduce randomness; in the **Python script** (not the browser UI) you can set `mutation_rate > 0` to discuss how resistance can appear from nothing.
 
 ---
 
@@ -98,7 +98,7 @@ By the end of the module students can:
 | "Bacteria 'decide' to become resistant." | There is no decision — it is differential survival/reproduction (run the unplugged game). |
 | "Resistance always rises." | Start high, no antibiotic → the **cost** makes resistance *fall* (notebook §3). |
 | "Small and large populations behave the same." | Run `n = 50` vs `n = 1000` → drift in small populations. |
-| "A lower dose is always better." | The sub-lethal (half-dose) curve still rises — *slower, but still to resistance*. |
+| "A lower dose is always better." | The weak-selection curve still rises — *slower*, but still toward resistance. This model does **not** give dosing advice. |
 
 ---
 
@@ -116,3 +116,4 @@ By the end of the module students can:
 - Fitness values are **teaching values**, not clinical data.
 - Space, host immune response and gene transfer are not modelled.
 - These limits are **discussed with students** — a model is a deliberate simplification, and its assumptions matter.
+- Because reproduction uses weighted random sampling, the same parameters can give slightly different curves across runs. Have students **repeat runs** and average them (or use the HTML simulator's "Run several times" control) before drawing conclusions.
