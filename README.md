@@ -10,6 +10,12 @@ Students run the model, change **one variable at a time**, and use the resulting
 frequency-vs-generation graphs as **evidence** to make a real recommendation about
 antibiotic use.
 
+## ▶ Live demo — no login, no install
+
+Open **https://felixxxxx11.github.io/antibiotic-resistance-sim/simulator.html** and click **运行模拟 (Run)**.
+
+To run offline, just **double-click `simulator.html`** — it works in any browser, no Python or account needed.
+
 ---
 
 ## What the model does
