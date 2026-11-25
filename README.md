@@ -12,7 +12,7 @@ antibiotic use.
 
 ## ▶ Live demo — no login, no install
 
-Open **https://felixxxxx11.github.io/antibiotic-resistance-sim/simulator.html** and click **运行模拟 (Run)**.
+Open **https://felixxxxx11.github.io/antibiotic-resistance-sim/simulator.html** and click **Run simulation**.
 
 To run offline, just **double-click `simulator.html`** — it works in any browser, no Python or account needed.
 
