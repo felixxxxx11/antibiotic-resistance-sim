@@ -62,9 +62,12 @@ The model itself uses only the Python standard library; `matplotlib` is optional
 ```
 Antibiotic_Resistance_Sim.ipynb   # main artifact (open in Colab)
 antibiotic_resistance_sim.py      # same model as an offline script
-teacher_materials/                # lesson plan, CT map, assessment, misconceptions, limitations
-figures/                          # example output plots
+teacher_materials/                # lesson plan, CT map, assessment, misconceptions, limitations,
+                                  #   student handout (prediction sheet / one-variable table / CER),
+                                  #   and transparent AI-use documentation
+figures/                          # example output plots + simulator UI + code snippet
 docs/                             # slide outline + 3-minute video script
+INT6064 Individual Module - Slides - WUPENGHUI.pptx   # 13-slide deck
 ```
 
 ## The two-lesson module
