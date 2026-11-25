@@ -34,6 +34,7 @@
   .result b{color:var(--dark)}
   .pill{display:inline-block;background:#eef5f2;border-radius:20px;padding:3px 10px;font-size:12px;color:var(--muted);margin-right:6px}
   .note{color:#6b7a77;font-size:12.5px;margin-top:8px}
+  .assumptions{background:#f4f8f6;border-left:3px solid var(--accent);padding:10px 12px;margin-top:12px;border-radius:6px;font-size:12px;line-height:1.55;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -55,17 +56,20 @@
       <label>Population size N <span class="val" id="nv">1000</span></label>
       <input id="n" type="range" min="50" max="2000" step="50" value="1000">
 
-      <label>Selection pressure</label>
+      <label>Selection strength (teaching scenario)</label>
       <select id="dose">
-        <option value="full">Strong selection (strong antibiotic)</option>
-        <option value="half">Weaker selection (weaker dose)</option>
+        <option value="strong">Strong selection (antibiotic strongly suppresses S)</option>
+        <option value="weak">Weak selection (antibiotic only mildly suppresses S)</option>
       </select>
 
-      <label>Antibiotic in environment</label>
+      <label>Antibiotic present?</label>
       <select id="abx">
-        <option value="on">Present (ON)</option>
-        <option value="off">Absent (OFF; resistance cost)</option>
+        <option value="on">Yes (antibiotic present)</option>
+        <option value="off">No (no antibiotic; resistance cost acts)</option>
       </select>
+
+      <label>Run several times (averages out randomness) <span class="val" id="repv">1</span></label>
+      <input id="reps" type="range" min="1" max="20" value="1">
 
       <div style="margin-top:16px;display:flex;gap:10px">
         <button class="primary" id="run">▶ Run simulation</button>
@@ -74,12 +78,17 @@
 
       <label style="margin-top:16px">Quick scenarios</label>
       <div class="presets">
-        <button data-preset="full">① Strong selection</button>
-        <button data-preset="none">② No antibiotic</button>
-        <button data-preset="half">③ Weaker selection</button>
+        <button data-preset="strong">① Strong selection</button>
+        <button data-preset="off">② No antibiotic</button>
+        <button data-preset="weak">③ Weak selection</button>
         <button data-preset="drift">④ Small population (drift)</button>
       </div>
-      <div class="note">Simplified teaching model — not medical advice.</div>
+
+      <div class="assumptions">
+        <b>Model assumptions:</b> population size is fixed; only two genotypes (S / R);
+        fitness values are illustrative teaching values, not clinical data; no immune system
+        or gene transfer. This is a model of natural selection — <b>not medical advice</b>.
+      </div>
     </div>
 
     <div class="card">
@@ -93,9 +102,10 @@
   <div class="card">
     <div style="font-weight:700;font-size:15px;margin-bottom:8px">Model overview</div>
     <p style="margin:0;color:var(--muted);line-height:1.7;font-size:14px">
-      Each generation repeats one loop: <b>selection</b> (bacteria reproduce according to fitness) → <b>reproduction</b> (weighted sampling; offspring inherit genotype) → <b>record</b> (resistant frequency).<br>
-      With the antibiotic present, susceptible bacteria have lower fitness while resistant bacteria survive. Without it, resistance carries a small fitness cost.<br>
-      This loop is the <b>algorithm</b>, repeated across generations. Steeper curve = faster increase in resistance.
+      Each generation repeats one loop: <b>selection</b> (bacteria reproduce according to fitness) → <b>reproduction</b> (weighted random sampling; offspring inherit genotype) → <b>record</b> (resistant frequency).<br>
+      With the antibiotic present, susceptible bacteria have lower fitness while resistant bacteria survive; without it, resistance carries a small fitness cost.<br>
+      Because reproduction is random, the same parameters can give slightly different curves. Increase "Run several times" to average out this randomness.<br>
+      This loop is the <b>algorithm</b>, repeated across generations. Steeper curve = faster rise.
     </p>
   </div>
 </div>
@@ -111,7 +121,7 @@ function weightedPick(pop, wS, wR){
   return pop[pop.length-1];
 }
 function simulate({n,gens,f0,dose,abx}){
-  const sOn = dose==='full' ? 0.15 : 0.60;
+  const sOn = dose==='strong' ? 0.15 : 0.60;
   const wS_no=1.0, wR_no=0.95, rOn=0.95;
   let nRes=Math.round(n*f0);
   let pop=new Array(n-nRes).fill('S').concat(new Array(nRes).fill('R'));
@@ -159,32 +169,41 @@ function drawChart(series){
 function readParams(){
   return { n:+document.getElementById('n').value, gens:+document.getElementById('gens').value,
            f0:+document.getElementById('f0').value/100, dose:document.getElementById('dose').value,
-           abx:document.getElementById('abx').value };
+           abx:document.getElementById('abx').value, reps:+document.getElementById('reps').value };
 }
 function updateLabels(){
   document.getElementById('f0v').textContent=document.getElementById('f0').value+'%';
   document.getElementById('genv').textContent=document.getElementById('gens').value;
   document.getElementById('nv').textContent=document.getElementById('n').value;
+  document.getElementById('repv').textContent=document.getElementById('reps').value;
 }
-['f0','gens','n'].forEach(id=>document.getElementById(id).addEventListener('input',updateLabels));
+['f0','gens','n','reps'].forEach(id=>document.getElementById(id).addEventListener('input',updateLabels));
 updateLabels();
+
+function finalFreq(hist){ return hist[hist.length-1]; }
 
 function renderOne(){
   const p=readParams();
-  const hist=simulate(p);
-  drawChart([{label:'custom',data:hist}]);
-  document.getElementById('legend').innerHTML='<span><i class="dot" style="background:'+COLORS[0]+'"></i>Current scenario</span>';
-  document.getElementById('result').innerHTML='Final resistant frequency: <b>'+(hist[hist.length-1]*100).toFixed(1)+'%</b>'+
-     '<span class="pill">N='+p.n+'</span><span class="pill">Start '+Math.round(p.f0*100)+'%</span>';
+  const total=Array(p.gens+1).fill(0);
+  for(let i=0;i<p.reps;i++){
+    const h=simulate({n:p.n,gens:p.gens,f0:p.f0,dose:p.dose,abx:p.abx});
+    for(let g=0;g<h.length;g++) total[g]+=h[g];
+  }
+  const hist=total.map(x=>x/p.reps);
+  drawChart([{label:'Average run',data:hist}]);
+  document.getElementById('legend').innerHTML=`<span><i class="dot" style="background:${COLORS[0]}"></i>${p.reps} run${p.reps>1?'s':''} averaged</span>`;
+  document.getElementById('result').innerHTML=`Final resistant frequency: <b>${finalFreq(hist).toFixed(1)}%</b>`+
+     `<span class="pill">N=${p.n}</span><span class="pill">Start ${Math.round(p.f0*100)}%</span>`+
+     `<span class="pill">${p.reps} run${p.reps>1?'s':''} averaged</span>`;
 }
 
 function renderCompare(){
   const base=readParams();
   const scen=[
-    {label:'Strong selection', color:COLORS[0], args:{...base, dose:'full', abx:'on', f0:0.01}},
-    {label:'Weaker selection', color:COLORS[1], args:{...base, dose:'half', abx:'on', f0:0.01}},
-    {label:'No antibiotic', color:COLORS[2], args:{...base, dose:'full', abx:'off', f0:0.50}},
-    {label:'Small population', color:COLORS[3], args:{...base, n:50, dose:'full', abx:'off', f0:0.30}},
+    {label:'Strong selection', color:COLORS[0], args:{...base, dose:'strong', abx:'on', f0:0.01}},
+    {label:'Weak selection', color:COLORS[1], args:{...base, dose:'weak', abx:'on', f0:0.01}},
+    {label:'No antibiotic', color:COLORS[2], args:{...base, dose:'strong', abx:'off', f0:0.50}},
+    {label:'Small population', color:COLORS[3], args:{...base, n:50, dose:'strong', abx:'off', f0:0.30}},
   ];
   const series=scen.map(s=>({label:s.label,data:simulate(s.args)}));
   drawChart(series);
@@ -198,10 +217,10 @@ document.querySelectorAll('.presets button').forEach(b=>{
   b.addEventListener('click',()=>{
     const pr=b.dataset.preset;
     const base=readParams();
-    if(pr==='full'){ document.getElementById('dose').value='full'; document.getElementById('abx').value='on'; document.getElementById('f0').value=1; }
-    if(pr==='none'){ document.getElementById('dose').value='full'; document.getElementById('abx').value='off'; document.getElementById('f0').value=50; }
-    if(pr==='half'){ document.getElementById('dose').value='half'; document.getElementById('abx').value='on'; document.getElementById('f0').value=1; }
-    if(pr==='drift'){ document.getElementById('dose').value='full'; document.getElementById('abx').value='off'; document.getElementById('f0').value=30; document.getElementById('n').value=50; }
+    if(pr==='strong'){ document.getElementById('dose').value='strong'; document.getElementById('abx').value='on'; document.getElementById('f0').value=1; }
+    if(pr==='off'){ document.getElementById('dose').value='strong'; document.getElementById('abx').value='off'; document.getElementById('f0').value=50; }
+    if(pr==='weak'){ document.getElementById('dose').value='weak'; document.getElementById('abx').value='on'; document.getElementById('f0').value=1; }
+    if(pr==='drift'){ document.getElementById('dose').value='strong'; document.getElementById('abx').value='off'; document.getElementById('f0').value=30; document.getElementById('n').value=50; }
     updateLabels(); renderOne();
   });
 });
