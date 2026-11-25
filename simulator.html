@@ -1,29 +1,23 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Antibiotic Resistance Evolution Simulator</title>
 <style>
-  :root{
-    --dark:#0f2b27; --accent:#17a67b; --accent2:#e4572e; --gold:#f2b134;
-    --bg:#f1f7f5; --card:#ffffff; --text:#1d2b28; --muted:#5a6663;
-  }
+  :root{--dark:#0f2b27; --accent:#17a67b; --accent2:#e4572e; --gold:#f2b134; --bg:#f1f7f5; --card:#ffffff; --text:#1d2b28; --muted:#5a6663;}
   *{box-sizing:border-box}
-  body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
-       background:linear-gradient(160deg,#e7f3ee,#f7fbf9);color:var(--text);min-height:100vh}
+  body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:linear-gradient(160deg,#e7f3ee,#f7fbf9);color:var(--text);min-height:100vh}
   header{background:var(--dark);color:#fff;padding:26px 28px}
   header h1{margin:0;font-size:26px;letter-spacing:.3px}
   header p{margin:6px 0 0;color:#bfe8d9;font-size:14px}
   .wrap{max-width:1080px;margin:0 auto;padding:22px}
-  .card{background:var(--card);border-radius:16px;box-shadow:0 8px 30px rgba(16,43,39,.08);
-        padding:20px;margin-bottom:18px}
+  .card{background:var(--card);border-radius:16px;box-shadow:0 8px 30px rgba(16,43,39,.08);padding:20px;margin-bottom:18px}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   @media(max-width:820px){.grid{grid-template-columns:1fr}}
   label{display:block;font-weight:600;font-size:13px;color:var(--muted);margin:10px 0 4px}
   input[type=range]{width:100%}
-  select,input[type=number]{width:100%;padding:8px 10px;border:1px solid #d7e3df;border-radius:10px;
-        font-size:14px;background:#fbfefd}
+  select,input[type=number]{width:100%;padding:8px 10px;border:1px solid #d7e3df;border-radius:10px;font-size:14px;background:#fbfefd}
   .row{display:flex;gap:12px}
   .row>div{flex:1}
   .val{font-variant-numeric:tabular-nums;font-weight:700;color:var(--dark)}
@@ -39,78 +33,76 @@
   .result{margin-top:12px;font-size:14px;color:var(--muted)}
   .result b{color:var(--dark)}
   .pill{display:inline-block;background:#eef5f2;border-radius:20px;padding:3px 10px;font-size:12px;color:var(--muted);margin-right:6px}
+  .note{color:#6b7a77;font-size:12.5px;margin-top:8px}
 </style>
 </head>
 <body>
 <header>
   <h1>Antibiotic Resistance Evolution Simulator</h1>
-  <p>INT6064 Individual Teaching Module · watch natural selection produce antibiotic resistance in seconds</p>
+  <p>Watch how selection changes the frequency of resistance across bacterial generations</p>
 </header>
 
 <div class="wrap">
   <div class="grid">
-    <!-- controls -->
     <div class="card">
-      <div style="font-weight:700;font-size:15px;margin-bottom:6px">设置参数</div>
-      <label>初始耐药比例 <span class="val" id="f0v">1%</span></label>
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px">Set model parameters</div>
+      <label>Initial resistant frequency <span class="val" id="f0v">1%</span></label>
       <input id="f0" type="range" min="0" max="100" value="1">
 
-      <label>世代数 <span class="val" id="genv">40</span></label>
+      <label>Generations <span class="val" id="genv">40</span></label>
       <input id="gens" type="range" min="10" max="100" value="40">
 
-      <label>种群大小 N <span class="val" id="nv">1000</span></label>
+      <label>Population size N <span class="val" id="nv">1000</span></label>
       <input id="n" type="range" min="50" max="2000" step="50" value="1000">
 
-      <label>用药强度（dose）</label>
+      <label>Selection pressure</label>
       <select id="dose">
-        <option value="full">全剂量（full）</option>
-        <option value="half">半剂量 / 低剂量（sub-lethal）</option>
+        <option value="full">Strong selection (strong antibiotic)</option>
+        <option value="half">Weaker selection (weaker dose)</option>
       </select>
 
-      <label>抗生素</label>
+      <label>Antibiotic in environment</label>
       <select id="abx">
-        <option value="on">使用中（ON）</option>
-        <option value="off">不使用（OFF，观察耐药代价）</option>
+        <option value="on">Present (ON)</option>
+        <option value="off">Absent (OFF; resistance cost)</option>
       </select>
 
       <div style="margin-top:16px;display:flex;gap:10px">
-        <button class="primary" id="run">▶ 运行模拟</button>
-        <button class="ghost" id="compare">比较全部情景</button>
+        <button class="primary" id="run">▶ Run simulation</button>
+        <button class="ghost" id="compare">Compare scenarios</button>
       </div>
 
-      <label style="margin-top:16px">快速情景</label>
+      <label style="margin-top:16px">Quick scenarios</label>
       <div class="presets">
-        <button data-preset="full">① 全疗程</button>
-        <button data-preset="none">② 停药（耐药代价）</button>
-        <button data-preset="half">③ 半剂量</button>
-        <button data-preset="drift">④ 小种群漂变</button>
+        <button data-preset="full">① Strong selection</button>
+        <button data-preset="none">② No antibiotic</button>
+        <button data-preset="half">③ Weaker selection</button>
+        <button data-preset="drift">④ Small population (drift)</button>
       </div>
+      <div class="note">Simplified teaching model — not medical advice.</div>
     </div>
 
-    <!-- chart -->
     <div class="card">
-      <div style="font-weight:700;font-size:15px;margin-bottom:8px">耐药比例随世代变化</div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:8px">Resistant frequency across generations</div>
       <canvas id="chart" width="720" height="420"></canvas>
       <div class="legend" id="legend"></div>
-      <div class="result" id="result">点击 <b>运行模拟</b> 开始</div>
+      <div class="result" id="result">Click <b>Run simulation</b> to begin</div>
     </div>
   </div>
 
   <div class="card">
-    <div style="font-weight:700;font-size:15px;margin-bottom:8px">模型说明</div>
+    <div style="font-weight:700;font-size:15px;margin-bottom:8px">Model overview</div>
     <p style="margin:0;color:var(--muted);line-height:1.7;font-size:14px">
-      每代重复一个循环：<b>选择</b>（细菌按适应度繁殖）→ <b>繁殖</b>（按适应度加权抽样，子代继承基因）→ <b>记录</b>（记录耐药比例）。
-      抗生素存在时，敏感菌（S）适应度低、耐药菌（R）存活；无抗生素时，耐药菌付出一点<b>生存代价</b>。
-      这就是<b>算法</b>：整个模型只是把这个循环重复很多次。
+      Each generation repeats one loop: <b>selection</b> (bacteria reproduce according to fitness) → <b>reproduction</b> (weighted sampling; offspring inherit genotype) → <b>record</b> (resistant frequency).<br>
+      With the antibiotic present, susceptible bacteria have lower fitness while resistant bacteria survive. Without it, resistance carries a small fitness cost.<br>
+      This loop is the <b>algorithm</b>, repeated across generations. Steeper curve = faster increase in resistance.
     </p>
   </div>
 </div>
 
 <script>
-// ---------- model ----------
 function rand(){ return Math.random(); }
 function weightedPick(pop, wS, wR){
-  // build cumulative
   let total=0;
   const cum=new Float64Array(pop.length);
   for(let i=0;i<pop.length;i++){ total += (pop[i]==='R'?wR:wS); cum[i]=total; }
@@ -139,21 +131,18 @@ function simulate({n,gens,f0,dose,abx}){
   return hist;
 }
 
-// ---------- chart ----------
 const cv=document.getElementById('chart'), ctx=cv.getContext('2d');
 const COLORS=['#e4572e','#f2b134','#17a67b','#2a6f9e'];
 function drawChart(series){
   const W=cv.width,H=cv.height,pad={l:56,r:18,t:18,b:42};
   ctx.clearRect(0,0,W,H);
   const plotW=W-pad.l-pad.r, plotH=H-pad.t-pad.b;
-  // grid + y labels
   ctx.strokeStyle='#e3ece8'; ctx.fillStyle='#8aa09a'; ctx.font='12px sans-serif'; ctx.lineWidth=1;
   for(let p=0;p<=100;p+=20){
     const y=pad.t+plotH*(1-p/100);
     ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
     ctx.fillText(p+'%',10,y+4);
   }
-  // axes
   ctx.strokeStyle='#b9ccc6'; ctx.beginPath();
   ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+plotH); ctx.lineTo(W-pad.r,pad.t+plotH); ctx.stroke();
   const maxGen=Math.max(...series.map(s=>s.data.length-1));
@@ -164,62 +153,58 @@ function drawChart(series){
     s.data.forEach((v,i)=>{ const x=xFor(i),y=yFor(v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
     ctx.stroke();
   });
-  // x label
-  ctx.fillStyle='#8aa09a'; ctx.fillText('世代 →',W-pad.r-60,H-14);
+  ctx.fillStyle='#8aa09a'; ctx.fillText('Generation →',W-pad.r-70,H-14);
 }
 
-// ---------- ui ----------
-const el=id=>document.getElementById(id);
 function readParams(){
-  return { n:+el('n').value, gens:+el('gens').value, f0:+el('f0').value/100,
-           dose:el('dose').value, abx:el('abx').value };
+  return { n:+document.getElementById('n').value, gens:+document.getElementById('gens').value,
+           f0:+document.getElementById('f0').value/100, dose:document.getElementById('dose').value,
+           abx:document.getElementById('abx').value };
 }
 function updateLabels(){
-  el('f0v').textContent=el('f0').value+'%';
-  el('genv').textContent=el('gens').value;
-  el('nv').textContent=el('n').value;
+  document.getElementById('f0v').textContent=document.getElementById('f0').value+'%';
+  document.getElementById('genv').textContent=document.getElementById('gens').value;
+  document.getElementById('nv').textContent=document.getElementById('n').value;
 }
-['f0','gens','n'].forEach(id=>el(id).addEventListener('input',updateLabels));
+['f0','gens','n'].forEach(id=>document.getElementById(id).addEventListener('input',updateLabels));
 updateLabels();
 
 function renderOne(){
   const p=readParams();
   const hist=simulate(p);
   drawChart([{label:'custom',data:hist}]);
-  el('legend').innerHTML=`<span><i class="dot" style="background:${COLORS[0]}"></i>当前情景</span>`;
-  el('result').innerHTML=`最终耐药比例：<b>${(hist[hist.length-1]*100).toFixed(1)}%</b>`+
-     `<span class="pill">N=${p.n}</span><span class="pill">起始 ${(p.f0*100).toFixed(0)}%</span>`;
+  document.getElementById('legend').innerHTML='<span><i class="dot" style="background:'+COLORS[0]+'"></i>Current scenario</span>';
+  document.getElementById('result').innerHTML='Final resistant frequency: <b>'+(hist[hist.length-1]*100).toFixed(1)+'%</b>'+
+     '<span class="pill">N='+p.n+'</span><span class="pill">Start '+Math.round(p.f0*100)+'%</span>';
 }
 
 function renderCompare(){
   const base=readParams();
   const scen=[
-    {label:'全疗程', color:COLORS[0], args:{...base, dose:'full', abx:'on', f0:0.01}},
-    {label:'半剂量', color:COLORS[1], args:{...base, dose:'half', abx:'on', f0:0.01}},
-    {label:'停药/耐药代价', color:COLORS[2], args:{...base, dose:'full', abx:'off', f0:0.50}},
-    {label:'小种群漂变', color:COLORS[3], args:{...base, n:50, dose:'full', abx:'off', f0:0.30}},
+    {label:'Strong selection', color:COLORS[0], args:{...base, dose:'full', abx:'on', f0:0.01}},
+    {label:'Weaker selection', color:COLORS[1], args:{...base, dose:'half', abx:'on', f0:0.01}},
+    {label:'No antibiotic', color:COLORS[2], args:{...base, dose:'full', abx:'off', f0:0.50}},
+    {label:'Small population', color:COLORS[3], args:{...base, n:50, dose:'full', abx:'off', f0:0.30}},
   ];
   const series=scen.map(s=>({label:s.label,data:simulate(s.args)}));
   drawChart(series);
-  el('legend').innerHTML=scen.map((s,i)=>`<span><i class="dot" style="background:${COLORS[i]}"></i>${s.label}</span>`).join('');
-  el('result').innerHTML='四种情景对比（曲线越陡=耐药上升越快）';
+  document.getElementById('legend').innerHTML=scen.map((s,i)=>`<span><i class="dot" style="background:${COLORS[i]}"></i>${s.label}</span>`).join('');
+  document.getElementById('result').innerHTML='Scenario comparison (steeper rise = faster increase in resistance)';
 }
 
-el('run').addEventListener('click',renderOne);
-el('compare').addEventListener('click',renderCompare);
+document.getElementById('run').addEventListener('click',renderOne);
+document.getElementById('compare').addEventListener('click',renderCompare);
 document.querySelectorAll('.presets button').forEach(b=>{
   b.addEventListener('click',()=>{
     const pr=b.dataset.preset;
     const base=readParams();
-    if(pr==='full'){ el('dose').value='full'; el('abx').value='on'; el('f0').value=1; }
-    if(pr==='none'){ el('dose').value='full'; el('abx').value='off'; el('f0').value=50; }
-    if(pr==='half'){ el('dose').value='half'; el('abx').value='on'; el('f0').value=1; }
-    if(pr==='drift'){ el('dose').value='full'; el('abx').value='off'; el('f0').value=30; el('n').value=50; }
+    if(pr==='full'){ document.getElementById('dose').value='full'; document.getElementById('abx').value='on'; document.getElementById('f0').value=1; }
+    if(pr==='none'){ document.getElementById('dose').value='full'; document.getElementById('abx').value='off'; document.getElementById('f0').value=50; }
+    if(pr==='half'){ document.getElementById('dose').value='half'; document.getElementById('abx').value='on'; document.getElementById('f0').value=1; }
+    if(pr==='drift'){ document.getElementById('dose').value='full'; document.getElementById('abx').value='off'; document.getElementById('f0').value=30; document.getElementById('n').value=50; }
     updateLabels(); renderOne();
   });
 });
-
-// draw an initial empty-ish state
 renderOne();
 </script>
 </body>
